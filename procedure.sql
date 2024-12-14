@@ -19,7 +19,7 @@ BEGIN
 END $$
 DELIMITER ;
 #-------------------------------------------------------------------
-\# 2. Xem danh sách lớp học phần và lịch dạy của một giảng viên
+# 2. Xem danh sách lớp học phần và lịch dạy của một giảng viên
 DELIMITER $$
 CREATE PROCEDURE GV (
     IN p_Ma_giang_vien VARCHAR(50)
@@ -41,8 +41,8 @@ BEGIN
     ORDER BY lh.Ngay_hoc,lh.Tiet_bat_dau;
     END $$
 DELIMITER ;
-
-# 2.  Xem danh sách lớp học phần và lịch dạy của trợ giảng
+#-------------------------------------------------------------------
+# 3.  Xem danh sách lớp học phần và lịch dạy của trợ giảng
 DELIMITER $$
 CREATE PROCEDURE TG (
     IN p_Ma_tro_giang VARCHAR(50)
@@ -66,4 +66,44 @@ BEGIN
     ORDER BY lbt.Ngay_hoc, lbt.Tiet_bat_dau;
 END $$
 DELIMITER ;
-
+#--------------------------------------------------------------------------------------------------------
+# 4. Trả về lịch học lý thuyết, lịch học các nhóm bài tập và giảng viên đảm nhiệm của một lớp học phần.
+DELIMITER $$
+CREATE PROCEDURE LichHoc(
+    IN p_Ma_lhp VARCHAR(50)
+)
+BEGIN
+    (SELECT 'Lý thuyết' AS Loai_lich,
+           lh.Ma_lhp AS 'Mã LHP/ Mã nhóm',
+           lhp.Ten_lhp AS 'Tên môn học',
+           CONCAT(gv.Hoc_vi,'.',gv.Ho_dem,' ',gv.Ten) AS 'Tên giảng viên/ trợ giảng',
+           lh.Ngay_hoc AS 'Ngày học',
+           lh.Tiet_bat_dau AS 'Tiết bắt đầu',
+           lh.Tiet_ket_thuc AS 'Tiết kết thúc',
+           ph.So_phong AS 'Phòng',
+           ph.Giang_duong AS 'Giảng đường'
+    FROM lich_hoc lh
+             INNER JOIN phong_hoc ph ON lh.Ma_phong = ph.Ma_phong
+             INNER JOIN lop_hoc_phan lhp ON lh.Ma_lhp = lhp.Ma_lhp
+             INNER JOIN giang_vien gv ON gv.Ma_giang_vien = lhp.Ma_giang_vien
+    WHERE lh.Ma_lhp = p_Ma_lhp ORDER BY lh.Ngay_hoc,lh.Tiet_bat_dau)
+    UNION ALL
+    (SELECT 'Nhóm thực hành' AS Loai_lich,
+           nbt.Ma_nhom AS 'Mã LHP/ Mã nhóm',
+           lhp.Ten_lhp AS 'Tên môn học',
+           CONCAT(tg.Hoc_vi,'.',tg.Ho_dem,' ',tg.Ten) AS 'Tên giảng viên/ trợ giảng',
+           lbt.Ngay_hoc AS 'Ngày học',
+           lbt.Tiet_bat_dau AS 'Tiết bắt đầu',
+           lbt.Tiet_ket_thuc AS 'Tiết kết thúc',
+           ph.So_phong AS 'Phòng',
+           ph.Giang_duong AS 'Giảng đường'
+    FROM nhom_bai_tap nbt
+             INNER JOIN lich_bai_tap lbt ON nbt.Ma_nhom = lbt.Ma_nhom
+             INNER JOIN phong_hoc ph ON lbt.Ma_phong = ph.Ma_phong
+            INNER JOIN lop_hoc_phan lhp ON lhp.Ma_lhp = nbt.Ma_lhp
+            INNER JOIN tro_giang tg ON tg.Ma_tro_giang = nbt.Ma_tro_giang
+    WHERE nbt.Ma_lhp = p_Ma_lhp ORDER BY lbt.Ngay_hoc,lbt.Tiet_bat_dau);
+END $$
+DELIMITER ;
+#--------------------------------------------------------------------------------------------------------------
+#5
