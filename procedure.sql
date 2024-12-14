@@ -1,5 +1,5 @@
 #--------------------------------------------------
-# 1. Procedure cập nhập lịch học
+# 1. Cập nhập lịch học
 DELIMITER $$
 CREATE PROCEDURE UpdateLichHoc(
     IN p_Ma_lhp CHAR(10),              
@@ -106,4 +106,43 @@ BEGIN
 END $$
 DELIMITER ;
 #--------------------------------------------------------------------------------------------------------------
-#5
+# 5. Tra ve cac lich hoc tai mot phong hoc trong ngay
+DELIMITER $$
+CREATE PROCEDURE PH(
+    IN p_Ma_phong VARCHAR(50),
+    IN p_Ngay CHAR(1)
+)
+BEGIN
+    SELECT 'Lịch học' AS Loai_lich,
+           lh.Ma_lhp AS 'Mã lhp/ nhóm',
+           lhp.Ten_lhp AS 'Tên môn học',
+           lh.Tiet_bat_dau AS 'Tiết bắt đầu',
+           lh.Tiet_ket_thuc AS 'Tiết kết thúc',
+           ph.So_phong AS 'Số phòng',
+           ph.Giang_duong AS 'Giảng đường'
+    FROM lich_hoc lh
+             INNER JOIN phong_hoc ph ON lh.Ma_phong = ph.Ma_phong
+             INNER JOIN lop_hoc_phan lhp ON lh.Ma_lhp = lhp.Ma_lhp
+    WHERE lh.Ma_phong = p_Ma_phong AND lh.Ngay_hoc = p_Ngay
+
+    UNION ALL
+
+    SELECT 'Thuc hành' AS Loai_lich,
+           nbt.Ma_nhom AS `Mã lhp/ nhóm`,
+           lhp.Ten_lhp AS 'Tên môn học',
+           lbt.Tiet_bat_dau AS 'Tiết bắt đầu',
+           lbt.Tiet_ket_thuc AS 'Tiết kết thúc',
+           ph.So_phong AS 'Số phòng',
+           ph.Giang_duong AS 'Giảng đường'
+    FROM nhom_bai_tap nbt
+             INNER JOIN lich_bai_tap lbt ON nbt.Ma_nhom = lbt.Ma_nhom
+             INNER JOIN phong_hoc ph ON lbt.Ma_phong = ph.Ma_phong
+             INNER JOIN lop_hoc_phan lhp ON nbt.Ma_lhp = lhp.Ma_lhp
+    WHERE lbt.Ma_phong = p_Ma_phong AND lbt.Ngay_hoc = p_Ngay
+    ORDER BY `Tiết bắt đầu`;
+END $$
+DELIMITER ;
+CALL PH('101_G2', 2);
+
+#--------------------------------------------------------------------------------------------------------------
+# 5. Tra ve cac lich hoc tai mot phong hoc trong ngay
