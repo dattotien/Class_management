@@ -57,6 +57,6 @@ CREATE TABLE IF NOT EXISTS lich_hoc (
   Tiet_bat_dau INT NOT NULL,
   Tiet_ket_thuc INT NOT NULL,
   Ma_phong VARCHAR(20) NOT NULL,
-  PRIMARY KEY (Ngay_hoc, Tiet_bat_dau,Tiet_ket_thuc, Ma_phong)
+  PRIMARY KEY (Ma_lhp, Ngay_hoc, Tiet_bat_dau, Ma_phong)
 );
-DROP DATABASE quan_li_lop_hoc;
+
