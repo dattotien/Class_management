@@ -41,6 +41,7 @@ BEGIN
     ORDER BY lh.Ngay_hoc,lh.Tiet_bat_dau;
     END $$
 DELIMITER ;
+CALL GV('GV004');
 #-------------------------------------------------------------------
 # 3.  Xem danh sách lớp học phần và lịch dạy của trợ giảng
 DELIMITER $$
@@ -105,6 +106,8 @@ BEGIN
     WHERE nbt.Ma_lhp = p_Ma_lhp ORDER BY lbt.Ngay_hoc,lbt.Tiet_bat_dau);
 END $$
 DELIMITER ;
+CALL LichHoc('INT2211_1');
+CALL TG('TG001');
 #--------------------------------------------------------------------------------------------------------------
 # 5. Tra ve cac lich hoc tai mot phong hoc trong ngay
 DELIMITER $$

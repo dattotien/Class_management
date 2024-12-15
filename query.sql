@@ -55,12 +55,7 @@ USE quan_li_lop_hoc;
 
 
 # 7.Truy vấn thông tin phòng học có lịch học vào tiết chẵn và giảng viên có học vị "TS"
-    SELECT
-        phong_hoc.Ma_phong,
-        lich_hoc.Ngay_hoc,
-        giang_vien.Ho_dem,
-        giang_vien.Ten,
-        giang_vien.Hoc_vi
+    SELECT phong_hoc.Ma_phong,lich_hoc.Ngay_hoc,giang_vien.Ho_dem,giang_vien.Ten,giang_vien.Hoc_vi
     FROM
         phong_hoc
     INNER JOIN lich_hoc
@@ -183,26 +178,10 @@ WHERE lich_thu_3.Ma_phong IS NULL;
 -- 2. Liệt kê tên giảng viên và số giờ dạy của mỗi giảng viên:
     SELECT gv.Ho_dem, gv.Ten, lh.Tong_gio_day
     FROM giang_vien gv
-             INNER JOIN (SELECT Ma_giang_vien, SUM(Tiet_ket_thuc - Tiet_bat_dau + 1) AS Tong_gio_day FROM lich_hoc GROUP BY Ma_giang_vien) AS lh
+             INNER JOIN (SELECT Ma_giang_vien, SUM(Tiet_ket_thuc - Tiet_bat_dau + 1) AS Tong_gio_day FROM lich_hoc
+            GROUP BY Ma_giang_vien) AS lh
                         ON gv.Ma_giang_vien = lh.Ma_giang_vien;
--- 3. Liệt kê tên phòng học và số lần được sử dụng trong lịch học:
-    SELECT
-        p.Ma_phong,
-        p.Giang_duong,
-        p.So_phong,
-        COALESCE(lh.So_lan_su_dung, 0) + COALESCE(lbt.So_lan_su_dung, 0) AS Tong_so_lan_su_dung
-    FROM
-        phong_hoc p
-        LEFT JOIN
-        (SELECT Ma_phong, COUNT(*) AS So_lan_su_dung
-         FROM lich_hoc
-         GROUP BY Ma_phong) AS lh ON p.Ma_phong = lh.Ma_phong
-        LEFT JOIN
-        (SELECT Ma_phong, COUNT(*) AS So_lan_su_dung
-         FROM lich_bai_tap
-         GROUP BY Ma_phong) AS lbt ON p.Ma_phong = lbt.Ma_phong
-    ORDER BY Tong_so_lan_su_dung DESC;
--- 4. Liệt kê tên trợ giảng và số nhóm bài tập mà họ phụ trách:
+-- 3. Liệt kê tên trợ giảng và số nhóm bài tập mà họ phụ trách:
     SELECT tg.Ho_dem, tg.Ten, nbt.So_nhom
     FROM tro_giang tg
              INNER JOIN (SELECT Ma_tro_giang, COUNT(*) AS So_nhom FROM nhom_bai_tap GROUP BY Ma_tro_giang) AS nbt
@@ -210,7 +189,8 @@ WHERE lich_thu_3.Ma_phong IS NULL;
 #--------------------------------------------------------------------------------------------------
 #Query sử dụng group by và  aggregate functions
 # 1. Trả về số lớp học mà giảng viên dạy trong học kỳ
-    SELECT gv.Ma_giang_vien AS 'Mã giảng viên', concat(gv.Hoc_vi,'.',gv.Ho_dem,' ',gv.Ten) AS 'Giảng viên',COUNT(*) AS 'Số lớp dạy'
+    SELECT gv.Ma_giang_vien AS 'Mã giảng viên', concat(gv.Hoc_vi,'.',gv.Ho_dem,' ',gv.Ten) AS 'Giảng viên',COUNT(*)
+        AS 'Số lớp dạy'
     FROM lop_hoc_phan lhp
     INNER JOIN giang_vien gv ON lhp.Ma_giang_vien = gv.Ma_giang_vien
     GROUP BY gv.Ma_giang_vien, gv.Ten;
@@ -259,7 +239,7 @@ GROUP BY tg.Ma_tro_giang, tg.Ho_dem, tg.Ten
 ORDER BY So_nhom_phu_trach DESC
 LIMIT 1;
 
-# 9. Tính tổng số giờ học của mỗi giảng viên
+# 9. Tính tổng số giờ daạy học của mỗi giảng viên
 SELECT gv.Ma_giang_vien, gv.Ho_dem, gv.Ten, SUM(lh.Tiet_ket_thuc - lh.Tiet_bat_dau + 1) AS Tong_gio_day
 FROM giang_vien gv LEFT JOIN lich_hoc lh ON gv.Ma_giang_vien = lh.Ma_giang_vien
 GROUP BY gv.Ma_giang_vien, gv.Ho_dem, gv.Ten;
