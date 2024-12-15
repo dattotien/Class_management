@@ -67,6 +67,7 @@ BEGIN
     ORDER BY lbt.Ngay_hoc, lbt.Tiet_bat_dau;
 END $$
 DELIMITER ;
+CALL TG('TG001');
 #--------------------------------------------------------------------------------------------------------
 # 4. Trả về lịch học lý thuyết, lịch học các nhóm bài tập và giảng viên đảm nhiệm của một lớp học phần.
 DELIMITER $$
@@ -107,7 +108,7 @@ BEGIN
 END $$
 DELIMITER ;
 CALL LichHoc('INT2211_1');
-CALL TG('TG001');
+
 #--------------------------------------------------------------------------------------------------------------
 # 5. Tra ve cac lich hoc tai mot phong hoc trong ngay
 DELIMITER $$

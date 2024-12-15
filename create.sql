@@ -59,4 +59,3 @@ CREATE TABLE IF NOT EXISTS lich_hoc (
   Ma_phong VARCHAR(20) NOT NULL,
   PRIMARY KEY (Ma_lhp, Ngay_hoc, Tiet_bat_dau, Ma_phong)
 );
-
